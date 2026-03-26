@@ -13471,6 +13471,36 @@
         setTimeout(setBaseByReferrer, 2000);
     </script>
 
+    <!-- COPIE ESTE BLOCO E COLE NO FINAL DO SEU INDEX.HTML NO GITHUB, ANTES DE </body> -->
+<script>
+    function notificarAltura() {
+        // Calcula a altura total do documento
+        var alturaTotal = Math.max(
+            document.body.scrollHeight, document.documentElement.scrollHeight,
+            document.body.offsetHeight, document.documentElement.offsetHeight,
+            document.body.clientHeight, document.documentElement.clientHeight
+        );
+        
+        // Envia a altura para o site "pai" (Loja Integrada)
+        window.parent.postMessage({ alturaIframe: alturaTotal }, "*");
+    }
+
+    // Tenta enviar a altura quando a página carrega
+    window.onload = notificarAltura;
+
+    // Tenta enviar a altura sempre que a janela for redimensionada
+    window.onresize = notificarAltura;
+
+    // Ponto Crítico: Páginas da Apple têm animações que mudam de tamanho à medida que se faz scroll.
+    // Este observador vigia o corpo da página e atualiza a altura sempre que houver mutações visuais.
+    if ('ResizeObserver' in window) {
+        var observer = new ResizeObserver(function() {
+            notificarAltura();
+        });
+        observer.observe(document.body);
+    }
+</script>
+
 </body>
 
 </html>
