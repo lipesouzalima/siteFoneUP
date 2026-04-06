@@ -18828,6 +18828,23 @@
         setTimeout(setBaseByReferrer, 2000);
     </script>
 
-
+<!-- INÍCIO: Proteção de Imagens -->
+<style>
+  /* Impede que a imagem seja arrastada */
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+</style>
+<script>
+  /* Desabilita o clique direito (menu de contexto) em toda a página */
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+</script>
+<!-- FIM: Proteção de Imagens -->
 
 </body></html>
