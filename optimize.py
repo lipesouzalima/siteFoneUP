@@ -3,7 +3,7 @@ from PIL import Image
 
 repo_dir = '/home/lipesouzalima/Landing Pages/siteFoneUP'
 
-def optimize_images_and_fix_names(page_folder, files_folder, old_prefix, new_prefix, max_dim=1920):
+def optimize_images_and_fix_names(page_folder, files_folder, old_prefix, new_prefix, max_dim=1080):
     img_dir = os.path.join(repo_dir, page_folder, files_folder)
     html_file = os.path.join(repo_dir, page_folder, "index.html")
     
