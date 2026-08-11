@@ -2,6 +2,7 @@ import os
 import re
 import urllib.request
 import argparse
+import subprocess
 
 """
 FoneUP - Master Pipeline de Migração e Sanitização
@@ -9,7 +10,7 @@ Uso: Coloque este script dentro da raiz do Landing Pages (junto das páginas) e 
 python3 foneup_master_pipeline.py --folder "nome-da-pasta" --modelo "iphone17" --nice-name "iPhone 17"
 """
 
-def process_landing_page(folder, foneup_code, nice_name):
+def process_landing_page(folder, foneup_code, nice_name, push=True):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     html_path = os.path.join(base_dir, folder, 'index.html')
     
@@ -118,11 +119,26 @@ def process_landing_page(folder, foneup_code, nice_name):
 
     print(f"[{nice_name}] Sanitização completa e payload injetado com sucesso!")
 
+    # 10. Commit e Push Automático para Vercel
+    if push:
+        try:
+            print(f"[{nice_name}] Enviando alterações para GitHub / Vercel...")
+            subprocess.run(["git", "add", folder], cwd=base_dir, check=True)
+            commit_msg = f"feat(landing): adicionar landing page {nice_name} sanitizada"
+            subprocess.run(["git", "commit", "-m", commit_msg], cwd=base_dir)
+            subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=base_dir, check=True)
+            subprocess.run(["git", "push", "origin", "main"], cwd=base_dir, check=True)
+            print(f"[{nice_name}] Commit e deploy na Vercel disparados com sucesso!")
+        except Exception as e:
+            print(f"Aviso ao realizar git push: {e}")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="FoneUP Universal Landing Page Migrator")
     parser.add_argument("--folder", required=True, help="Nome do diretório (ex: macbook-pro)")
     parser.add_argument("--modelo", required=True, help="Prefixo dos arquivos (ex: mpro)")
     parser.add_argument("--nice-name", required=True, help="Nome Bonito para SEO (ex: MacBook Pro 16)")
+    parser.add_argument("--no-push", action="store_true", help="Desativa o commit/push automático")
     args = parser.parse_args()
     
-    process_landing_page(args.folder, args.modelo, args.nice_name)
+    process_landing_page(args.folder, args.modelo, args.nice_name, push=not args.no_push)
+
