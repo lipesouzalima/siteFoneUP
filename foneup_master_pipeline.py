@@ -96,7 +96,8 @@ def process_landing_page(folder, foneup_code, nice_name, push=True):
     content = re.sub(r'const refUrl = new URL\(referrer\);.*?if \(refUrl\.origin\.includes.*?\}', '', content, flags=re.DOTALL)
 
     # 7. Limpeza e Automação de Links Comerciais FoneUP
-    content = re.sub(r'href="https://www\.iplace\.com\.br/?.*?"', lambda m: 'href="https://www.foneup.com.br/iphone"' if 'cat' in m.group(0) else 'href="https://www.foneup.com.br"', content)
+    content = re.sub(r'href="https?://(?:www\.)?iplace[a-zA-Z0-9_\.-]*\.com\.br/?.*?"', lambda m: 'href="https://www.foneup.com.br/mac"' if 'mac' in m.group(0).lower() else ('href="https://www.foneup.com.br/iphone"' if 'iphone' in m.group(0).lower() or 'cat' in m.group(0).lower() else 'href="https://www.foneup.com.br"'), content)
+    content = re.sub(r'https?://(?:www\.)?iplace[a-zA-Z0-9_\.-]*\.com\.br', 'https://www.foneup.com.br', content, flags=re.IGNORECASE)
 
     # 8. Injeção de Roteamento Padrão FoneUP na Vercel
     content = re.sub(r'<!--\s*<base[^>]*>\s*-->', '', content)
