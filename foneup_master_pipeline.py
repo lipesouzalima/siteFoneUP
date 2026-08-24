@@ -91,6 +91,20 @@ def process_landing_page(folder, foneup_code, nice_name, push=True):
     content = content.replace('https://www.iplace.com.br/file/general/', f'./{img_dir}/')
     content = content.replace('file/general/', f'./{img_dir}/')
 
+    # 5.1 Varredura geral para qualquer ocorrência de nomes de arquivos iplace restantes
+    def sanitize_raw_asset_name(m):
+        raw = m.group(0)
+        clean = re.sub(r'^iplace(?:prd|app)?_\d+_[a-zA-Z0-9]+_', '', raw, flags=re.IGNORECASE)
+        clean = re.sub(r'^iplace(?:prd|app)?_', '', clean, flags=re.IGNORECASE)
+        clean = re.sub(r'iplace', '', clean, flags=re.IGNORECASE)
+        if clean.startswith('_') or clean.startswith('-'):
+            clean = clean[1:]
+        if not clean.startswith(f"foneup-{foneup_code}-"):
+            clean = f"foneup-{foneup_code}-" + clean.replace('_', '-')
+        return clean
+
+    content = re.sub(r'iplace(?:prd|app)?[a-zA-Z0-9_\.-]*?\.(?:png|jpg|jpeg|svg|webp|gif|mp4)', sanitize_raw_asset_name, content, flags=re.IGNORECASE)
+
     # 6. Remover Scripts de Tracking e Monitoramento de Análise Institucional
     content = re.sub(r'<script>\s*try\s*\{\s*const\s*referrer\s*=\s*document\.referrer;.*?catch\s*\(err\)\s*\{\}\s*</script>', '', content, flags=re.DOTALL)
     content = re.sub(r'const refUrl = new URL\(referrer\);.*?if \(refUrl\.origin\.includes.*?\}', '', content, flags=re.DOTALL)
