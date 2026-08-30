@@ -109,6 +109,10 @@ def process_landing_page(folder, foneup_code, nice_name, push=True):
     content = re.sub(r'<script>\s*try\s*\{\s*const\s*referrer\s*=\s*document\.referrer;.*?catch\s*\(err\)\s*\{\}\s*</script>', '', content, flags=re.DOTALL)
     content = re.sub(r'const refUrl = new URL\(referrer\);.*?if \(refUrl\.origin\.includes.*?\}', '', content, flags=re.DOTALL)
 
+    # 6.1 Purgar prefixos Oracle Cloud Commerce (ex: /occ-live/iplacesitehttps://...)
+    content = re.sub(r'/occ-live/[a-zA-Z0-9_-]*(https?://)', r'\1', content, flags=re.IGNORECASE)
+    content = re.sub(r'/occ-live/[a-zA-Z0-9_-]*', '', content, flags=re.IGNORECASE)
+
     # 7. Limpeza e Automação de Links Comerciais FoneUP
     content = re.sub(r'href="https?://(?:www\.)?iplace[a-zA-Z0-9_\.-]*\.com\.br/?.*?"', lambda m: 'href="https://www.foneup.com.br/mac"' if 'mac' in m.group(0).lower() else ('href="https://www.foneup.com.br/iphone"' if 'iphone' in m.group(0).lower() or 'cat' in m.group(0).lower() else 'href="https://www.foneup.com.br"'), content)
     content = re.sub(r'https?://(?:www\.)?iplace[a-zA-Z0-9_\.-]*\.com\.br', 'https://www.foneup.com.br', content, flags=re.IGNORECASE)
