@@ -41,7 +41,6 @@ def download_asset(url, dest_path):
             f.write(resp.read())
         return True
     except Exception as e:
-        print(f"Aviso ao baixar {url}: {e}")
         return False
 
 def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name, push=True):
@@ -59,16 +58,13 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
 
     print(f"[{nice_name}] Iniciando processamento a partir do Apple Source...")
 
-    # 1. Remover Global Header do site da Apple e scripts de métricas/analytics/dados corporativos
-    html = re.sub(r'<div\s+id="globalheader">.*?</div>\s*<div\s+id="globalnav-placeholder"></div>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<div\s+id="globalheader">.*?</div>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<aside\s+id="globalmessage-segment".*?</aside>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<nav\s+id="globalnav".*?</nav>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<div\s+id="globalnav-curtain".*?</div>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<div\s+id="globalnav-placeholder".*?</div>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<script\s+id="__ACGH_DATA__"[^>]*>.*?</script>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<script\s+id="globalheader-data"[^>]*>.*?</script>', '', html, flags=re.DOTALL)
-    html = re.sub(r'<meta\s+name="globalnav-[^>]*>', '', html, flags=re.IGNORECASE)
+    # 1. Remover Global Header do site da Apple (tudo entre <body...> e o início da navegação do produto)
+    html = re.sub(r'(<body[^>]*>).*?(<input[^>]*id="ac-ln-menustate"|<nav[^>]*id="ac-localnav")', r'\1\n\t\2', html, flags=re.DOTALL)
+    
+    # 2. Remover o footer institucional/sitemap da Apple (manter apenas footnotes/disclaimers do produto)
+    html = re.sub(r'<nav\s+class="ac-gf-directory".*?</footer>', r'</footer>', html, flags=re.DOTALL)
+    
+    # 3. Remover links de métricas, analytics, tags hreflang alternativas e cabeçalhos residuais
     html = re.sub(r'<link[^>]*globalheader\.css[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'<script[^>]*globalheader[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
     html = re.sub(r'<script[^>]*metrics[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
@@ -76,12 +72,15 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     html = re.sub(r'<script[^>]*data-relay[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
     html = re.sub(r'<script[^>]*localeswitcher[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
     html = re.sub(r'<script[^>]*autopricing[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
+    html = re.sub(r'<script\s+id="__ACGH_DATA__"[^>]*>.*?</script>', '', html, flags=re.DOTALL)
+    html = re.sub(r'<script\s+id="globalheader-data"[^>]*>.*?</script>', '', html, flags=re.DOTALL)
+    html = re.sub(r'<meta\s+name="globalnav-[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'<link\s+rel="alternate"[^>]*>', '', html, flags=re.IGNORECASE)
 
-    # 2. Coletar e Mapear todos os Assets (HTML + CSS)
+    # 4. Coletar e Mapear todos os Assets (HTML + CSS)
     all_raw_urls = set()
     
-    # 2.1 Srcset
+    # Srcset
     for m in re.finditer(r'(?:srcset|data-srcset)\s*=\s*["\']([^"\'>]+)["\']', html):
         raw_val = m.group(1)
         for entry in raw_val.split(','):
@@ -91,14 +90,14 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
                 if url_part and not url_part.startswith('data:'):
                     all_raw_urls.add(url_part)
 
-    # 2.2 Src, Href, Content (og:image, css, js, images, mp4)
+    # Src, Href, Content (og:image, css, js, images, mp4)
     for m in re.finditer(r'(?:src|href|content|poster|data-src)\s*=\s*["\']([^"\'>\s]+)["\']', html):
         val = m.group(1).strip()
         if not val.startswith('data:') and not val.startswith('#') and not val.startswith('mailto:') and not val.startswith('tel:'):
             if any(val.lower().endswith(ext) or (ext + '?') in val.lower() or ext in val.lower() for ext in ['.png', '.jpg', '.jpeg', '.svg', '.webp', '.mp4', '.gif', '.css', '.js', '.woff', '.woff2', '.ttf']):
                 all_raw_urls.add(val)
 
-    # 2.3 url() no HTML
+    # url() no HTML
     for m in re.finditer(r'url\(["\']?([^"\'\)]+)["\']?\)', html):
         val = m.group(1).strip()
         if not val.startswith('data:'):
@@ -134,7 +133,7 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
         futures = [executor.submit(download_asset, u, p) for u, p in download_tasks]
         concurrent.futures.wait(futures)
 
-    # 3. Processar CSS locais para baixar sub-assets (fontes, SVGs em url())
+    # 5. Processar CSS locais para baixar sub-assets (fontes, SVGs em url())
     css_files = [f for f in os.listdir(img_dir_path) if f.endswith('.css')]
     for css_file in css_files:
         css_path = os.path.join(img_dir_path, css_file)
@@ -162,11 +161,11 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
         with open(css_path, 'w', encoding='utf-8') as f:
             f.write(css_content)
 
-    # 4. Substituir URLs no HTML
+    # 6. Substituir URLs no HTML
     for raw_url, (full_url, local_file_path, local_rel_path, clean_name) in url_to_local_map.items():
         html = html.replace(raw_url, local_rel_path)
 
-    # 5. Sanitização de Links Comerciais & Navegação
+    # 7. Sanitização de Links Comerciais & Navegação
     html = re.sub(r'https?://(?:www\.)?apple\.com/br/shop/goto/buy_airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
     html = re.sub(r'/br/shop/goto/buy_airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
     html = re.sub(r'https?://(?:www\.)?apple\.com/br/airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
@@ -174,14 +173,16 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     html = re.sub(r'https?://(?:www\.)?apple\.com/br/shop[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
     html = re.sub(r'/br/shop[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
     html = re.sub(r'https?://(?:www\.)?apple\.com/br/?.*?"', 'https://www.foneup.com.br"', html, flags=re.IGNORECASE)
-    html = re.sub(r'https?://support\.apple\.com[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
-    html = re.sub(r'https?://(?:www\.)?apple\.com[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
+    html = re.sub(r'https?://(?:[a-zA-Z0-9_\.-]+\.)?apple\.com[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
+    html = re.sub(r'/br/search[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
+    html = re.sub(r'support\.apple\.com(?:/[a-zA-Z0-9_\.-]+)*', 'www.foneup.com.br', html, flags=re.IGNORECASE)
+    html = re.sub(r'apple\.com', 'foneup.com.br', html, flags=re.IGNORECASE)
 
-    # 6. Fallback Seguro Mobile (WebKit bug fix para imagens 2X)
+    # 8. Fallback Seguro Mobile (WebKit bug fix para imagens 2X)
     pattern_2x = r'(src\s*=\s*["\'][^"\']*)-2x(\.(?:png|jpg|jpeg|webp|gif)["\'])'
     html = re.sub(pattern_2x, r'\1\2', html)
 
-    # 7. SEO, Title e Roteamento Vercel
+    # 9. SEO, Title e Roteamento Vercel
     html = re.sub(r'<title>.*?</title>', f'<title>FoneUP | Compre o novo {nice_name}</title>', html, flags=re.DOTALL)
     if '<title>' not in html:
         html = re.sub(r'(?i)(<head[^>]*>)', r'\1\n    <title>FoneUP | Compre o novo ' + nice_name + '</title>', html, count=1)
@@ -195,13 +196,13 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     base_tag = f'<base href="/{folder}/" target="_top">'
     html = re.sub(r'(?i)(<head[^>]*>)', r'\1\n    ' + base_tag, html, count=1)
 
-    # 8. Salvar HTML Final Sanitizado
+    # 10. Salvar HTML Final Sanitizado
     with open(target_html_path, 'w', encoding='utf-8') as f:
         f.write(html)
 
     print(f"[{nice_name}] Sanitização completa e payload injetado com sucesso em {target_html_path}!")
 
-    # 9. Automação Git e Deploy Vercel
+    # 11. Automação Git e Deploy Vercel
     if push:
         print(f"[{nice_name}] Enviando alterações para GitHub / Vercel...")
         try:
