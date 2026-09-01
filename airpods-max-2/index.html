@@ -314,6 +314,7 @@
 
     
     
+    
     <style>
         .subsection-hifi-sound .subsection-header,
         .subsection-hifi-sound .subsection-headline,
@@ -330,7 +331,7 @@
             padding-top: 30px !important;
             margin-top: 0 !important;
         }
-        /* Hero Video & Seamless Poster Transition */
+        /* Hero Video: Sem Fade Out Branco, Loop Infinito Indestrutível */
         .section-welcome .video-wrapper video {
             position: absolute !important;
             top: 0 !important;
@@ -338,6 +339,8 @@
             width: 100% !important;
             height: 100% !important;
             object-fit: cover !important;
+            opacity: 1 !important;
+            visibility: visible !important;
             z-index: 2 !important;
         }
         .section-welcome .video-wrapper .start-frame {
@@ -347,7 +350,7 @@
             width: 100% !important;
             height: 100% !important;
             z-index: 3 !important;
-            transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+            transition: opacity 0.5s ease !important;
             pointer-events: none !important;
         }
         .section-welcome .video-wrapper .start-frame img {
@@ -380,6 +383,7 @@
             margin: 0 auto !important;
         }
     </style>
+
 
 
     
@@ -2306,6 +2310,7 @@
 
 
 
+
 <script>
 ;(function() {
     function initHeroVideo() {
@@ -2313,24 +2318,44 @@
         var wrapper = document.querySelector('.section-welcome .video-wrapper');
         if (!v || !wrapper) return;
         
-        function onFrameReady() {
-            if (v.currentTime > 0.05 && !v.paused) {
+        function handleTime() {
+            if (v.currentTime > 0.05) {
                 wrapper.classList.add('video-ready');
+            }
+            // If near the end (duration is 11.66s), loop seamlessly to 0
+            if (v.duration && v.currentTime >= (v.duration - 0.15)) {
+                v.currentTime = 0;
+                v.play();
             }
         }
         
-        v.addEventListener('timeupdate', onFrameReady);
-        v.addEventListener('playing', onFrameReady);
+        function handleRestart() {
+            wrapper.classList.remove('ended');
+            wrapper.classList.add('playing', 'video-ready');
+            v.currentTime = 0;
+            v.play();
+        }
         
-        // Auto play try
-        var playPromise = v.play();
-        if (playPromise !== undefined) {
-            playPromise.then(function() {}).catch(function() {
+        v.addEventListener('timeupdate', handleTime);
+        v.addEventListener('ended', handleRestart);
+        v.addEventListener('pause', function() {
+            if (!v.dataset.userPaused) {
+                wrapper.classList.remove('ended');
+                wrapper.classList.add('playing');
+                v.play();
+            }
+        });
+        
+        // Initial play
+        var p = v.play();
+        if (p && p.catch) {
+            p.catch(function() {
                 v.muted = true;
                 v.play();
             });
         }
     }
+    
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initHeroVideo);
     } else {
@@ -2338,6 +2363,7 @@
     }
 })();
 </script>
+
 
 </body>
 </html>
