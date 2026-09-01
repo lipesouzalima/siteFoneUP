@@ -1,0 +1,99 @@
+/* Local Overrides */
+
+/* DP superscript loading */
+
+.marquee .pricing-product .custom_sup:empty + .footnote-supglyph {
+	display: none;
+}
+
+/* Higlights section */
+
+.media-gallery-item-1 .custom-br {
+	display: none;
+}
+
+@media (max-width: 1068px) {
+	.media-gallery-item-1 .custom-br {
+		display: block;
+	}
+}
+
+@media (min-width: 1350px) {
+	.media-gallery-item-1 .custom-br {
+		display: block;
+	}
+}
+
+.media-gallery-item-1 .typography-media-card-gallery-headline {
+	margin-right: 0;
+}
+
+@media (min-width: 1300px) {
+	.section-media-card .media-gallery-item-3 .custom-span {
+		text-wrap: nowrap;
+	}
+}
+
+/* Bento section */
+
+.subsection-hifi-sound .subsection-header .subsection-headline {
+	max-width: unset;
+}
+
+.product-tile-airpods-pro-3 [data-grid-row-9] .custom_lb-copy p {
+	max-width: 182px;
+}
+
+@media (min-width: 1068px) {
+	li.product-tile.product-tile-airpods-pro-3
+		> div.tout-group.typography-tout-copy
+		> div:nth-child(11)
+		> div.tout-copy {
+		width: 160px;
+	}
+}
+
+/* Exports fixes */
+
+@media only screen and (min-width: 481px) and (max-width: 485px) {
+	#media-card-gallery-item-4
+		.caption-container
+		.typography-media-card-gallery-headline {
+		padding: 0 10px;
+	}
+}
+
+@media only screen and (min-width: 481px) and (max-width: 491px) {
+	#media-card-gallery-item-2
+		.caption-container
+		.typography-media-card-gallery-headline {
+		padding: 0 10px;
+	}
+}
+
+/* hero headline */
+
+@media (min-width: 1788px) {
+	.section-welcome
+		.marquee
+		.marquee-header
+		.header-headline.typography-marquee-headline-elevated
+		br {
+		display: none;
+	}
+}
+
+@media only screen and (min-width: 480px) and (max-width: 505px) {
+	.ric-modal.product-stories-hifi-sound
+		.hifi-sound-gallery
+		.gallery-item.current
+		.gallery-item-caption {
+		padding-left: 20px;
+		padding-right: 20px;
+		margin-top: 75px;
+	}
+}
+
+.subsection-anc .adaptive-audio-container .image.image-flex-fix {
+	display: flex;
+}
