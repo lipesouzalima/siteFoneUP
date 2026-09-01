@@ -329,6 +329,19 @@
             padding-top: 30px !important;
             margin-top: 0 !important;
         }
+        
+        /* Fix Hero Video Animation Looping */
+        .section-welcome .video-wrapper video {
+            opacity: 1 !important;
+            z-index: 5 !important;
+        }
+        .section-welcome .video-wrapper.playing .start-frame,
+        .section-welcome .video-wrapper.playing .fallback-frame {
+            opacity: 0 !important;
+            transition: opacity 0.4s ease !important;
+            pointer-events: none !important;
+        }
+
         /* Fix Print 1: Startframe sempre visivel */
         .overview-media-card-anc-startframe img {
             opacity: 1 !important;
@@ -478,7 +491,11 @@
 			<div class="media-container" data-component-list="ObjectFitCover" data-cover-target=".inline-media-component-container" data-video-container=".video-wrapper">
 				<div class="inline-media-component-container with-media-ui with-media-ui-button">
 					<div class="video-wrapper" data-video-id="welcome-hero-airpods-max" data-component-list="InlineMediaDefault">
-						<video id="welcome-hero-airpods-max" preload="none" role="img" muted playsinline loop data-inline-media data-inline-media-basepath="./airpods-max-2_files/max-loop/" data-inline-media-plugins="PlayPauseButton, AnimLoad, AnimPlay, ViewportSourceOnce, LoadTimeout" data-inline-media-retina-enabled="true" data-inline-media-play-keyframe='{ "start": "t - 100vh", "end": "b", "disabledWhen": "firefox" }' data-inline-media-load-keyframe='{ "start": "t - 200vh", "end": "b + 100vh", "disabledWhen": "firefox" }' data-load-timeout="5000" data-inline-media-retina-enabled="false" aria-label="Animação: cinco fones de ouvido circum-auriculares AirPods Max 2 nas cores estelar, laranja, roxa, azul e meia-noite aparecendo um após o outro em um efeito de túnel"></video>
+						<video id="welcome-hero-airpods-max" autoplay muted playsinline loop preload="auto" onplay="this.closest('.video-wrapper')?.classList.add('playing');" onpause="if(!this.dataset.userPaused) this.play();" role="img" data-inline-media data-inline-media-basepath="./airpods-max-2_files/max-loop/" data-inline-media-plugins="PlayPauseButton, ViewportSourceOnce" data-inline-media-retina-enabled="true" data-inline-media-play-keyframe='{ "start": "t - 100vh", "end": "b", "disabledWhen": "firefox" }' data-inline-media-load-keyframe='{ "start": "t - 200vh", "end": "b + 100vh", "disabledWhen": "firefox" }' data-load-timeout="5000" aria-label="Animação: cinco fones de ouvido circum-auriculares AirPods Max 2 nas cores estelar, laranja, roxa, azul e meia-noite aparecendo um após o outro em um efeito de túnel">
+						<source src="./airpods-max-2_files/max-loop/xlarge.mp4" type="video/mp4" media="(min-width: 1441px)">
+						<source src="./airpods-max-2_files/max-loop/large.mp4" type="video/mp4" media="(max-width: 1440px)">
+						<source src="./airpods-max-2_files/max-loop/medium.mp4" type="video/mp4" media="(max-width: 1068px)">
+						<source src="./airpods-max-2_files/max-loop/small.mp4" type="video/mp4" media="(max-width: 734px)"></video>
 						<picture id="overview-welcome-max-loop-startframe-1" class="overview-welcome-max-loop-startframe fallback-frame" data-lazy data-download-area-keyframe='{&quot;start&quot;: &quot;t - 150vh&quot;, &quot;end&quot;: &quot;b&quot;, &quot;disabledWhen&quot;: &quot;inline-media&quot;}'>
 							<source data-empty srcset="data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" media="(min-width:0px)" />
 							<img src="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" onload="window.__lp?.(event)" alt="Imagem da parte da frente de cinco fones de ouvido AirPods Max 2 enfileirados nas cores estelar, laranja, roxa, azul e meia-noite">
