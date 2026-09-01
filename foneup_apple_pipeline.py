@@ -59,11 +59,16 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
 
     print(f"[{nice_name}] Iniciando processamento a partir do Apple Source...")
 
-    # 1. Remover Global Header do site da Apple e scripts de métricas/analytics
+    # 1. Remover Global Header do site da Apple e scripts de métricas/analytics/dados corporativos
     html = re.sub(r'<div\s+id="globalheader">.*?</div>\s*<div\s+id="globalnav-placeholder"></div>', '', html, flags=re.DOTALL)
     html = re.sub(r'<div\s+id="globalheader">.*?</div>', '', html, flags=re.DOTALL)
     html = re.sub(r'<aside\s+id="globalmessage-segment".*?</aside>', '', html, flags=re.DOTALL)
     html = re.sub(r'<nav\s+id="globalnav".*?</nav>', '', html, flags=re.DOTALL)
+    html = re.sub(r'<div\s+id="globalnav-curtain".*?</div>', '', html, flags=re.DOTALL)
+    html = re.sub(r'<div\s+id="globalnav-placeholder".*?</div>', '', html, flags=re.DOTALL)
+    html = re.sub(r'<script\s+id="__ACGH_DATA__"[^>]*>.*?</script>', '', html, flags=re.DOTALL)
+    html = re.sub(r'<script\s+id="globalheader-data"[^>]*>.*?</script>', '', html, flags=re.DOTALL)
+    html = re.sub(r'<meta\s+name="globalnav-[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'<link[^>]*globalheader\.css[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'<script[^>]*globalheader[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
     html = re.sub(r'<script[^>]*metrics[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
@@ -162,15 +167,15 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
         html = html.replace(raw_url, local_rel_path)
 
     # 5. Sanitização de Links Comerciais & Navegação
-    html = re.sub(r'href="https?://(?:www\.)?apple\.com/br/shop/goto/buy_airpods[^"]*"', 'href="https://www.foneup.com.br/airpods"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="/br/shop/goto/buy_airpods[^"]*"', 'href="https://www.foneup.com.br/airpods"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="https?://(?:www\.)?apple\.com/br/airpods[^"]*"', 'href="https://www.foneup.com.br/airpods"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="/br/airpods[^"]*"', 'href="https://www.foneup.com.br/airpods"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="https?://(?:www\.)?apple\.com/br/shop[^"]*"', 'href="https://www.foneup.com.br"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="/br/shop[^"]*"', 'href="https://www.foneup.com.br"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="https?://(?:www\.)?apple\.com/br/?.*?"', 'href="https://www.foneup.com.br"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="/br/?.*?"', 'href="https://www.foneup.com.br"', html, flags=re.IGNORECASE)
-    html = re.sub(r'href="https?://(?:www\.)?apple\.com/?.*?"', 'href="https://www.foneup.com.br"', html, flags=re.IGNORECASE)
+    html = re.sub(r'https?://(?:www\.)?apple\.com/br/shop/goto/buy_airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
+    html = re.sub(r'/br/shop/goto/buy_airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
+    html = re.sub(r'https?://(?:www\.)?apple\.com/br/airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
+    html = re.sub(r'/br/airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
+    html = re.sub(r'https?://(?:www\.)?apple\.com/br/shop[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
+    html = re.sub(r'/br/shop[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
+    html = re.sub(r'https?://(?:www\.)?apple\.com/br/?.*?"', 'https://www.foneup.com.br"', html, flags=re.IGNORECASE)
+    html = re.sub(r'https?://support\.apple\.com[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
+    html = re.sub(r'https?://(?:www\.)?apple\.com[^\s"\'<>]*', 'https://www.foneup.com.br', html, flags=re.IGNORECASE)
 
     # 6. Fallback Seguro Mobile (WebKit bug fix para imagens 2X)
     pattern_2x = r'(src\s*=\s*["\'][^"\']*)-2x(\.(?:png|jpg|jpeg|webp|gif)["\'])'
