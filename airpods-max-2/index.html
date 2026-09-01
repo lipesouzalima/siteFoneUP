@@ -313,6 +313,7 @@
 	<script src="./airpods-max-2_files/foneup-airpodsmax2-head.built.js" type="text/javascript" charset="utf-8"></script>
 
     
+    
     <style>
         .subsection-hifi-sound .subsection-header,
         .subsection-hifi-sound .subsection-headline,
@@ -329,25 +330,40 @@
             padding-top: 30px !important;
             margin-top: 0 !important;
         }
-        
-        /* Fix Hero Video Animation Looping */
+        /* Hero Video & Seamless Poster Transition */
         .section-welcome .video-wrapper video {
-            opacity: 1 !important;
-            z-index: 5 !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            z-index: 2 !important;
         }
-        .section-welcome .video-wrapper.playing .start-frame,
-        .section-welcome .video-wrapper.playing .fallback-frame {
-            opacity: 0 !important;
-            transition: opacity 0.4s ease !important;
+        .section-welcome .video-wrapper .start-frame {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 3 !important;
+            transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
             pointer-events: none !important;
         }
-
-        /* Fix Print 1: Startframe sempre visivel */
+        .section-welcome .video-wrapper .start-frame img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+        .section-welcome .video-wrapper.video-ready .start-frame {
+            opacity: 0 !important;
+        }
+        /* Highlights ANC startframe */
         .overview-media-card-anc-startframe img {
             opacity: 1 !important;
             display: block !important;
         }
-        /* Fix Print 2: Card de Pareamento Dinâmico perfeitamente ajustado e centralizado */
+        /* Pareamento Dinâmico Card */
         .section-product-stories .scroll-gallery .gallery-item-content.auto-detect {
             background-color: #f5f5f7 !important;
             display: flex !important;
@@ -364,6 +380,7 @@
             margin: 0 auto !important;
         }
     </style>
+
 
     
 </head>
@@ -490,32 +507,14 @@
 			</div>
 			<div class="media-container" data-component-list="ObjectFitCover" data-cover-target=".inline-media-component-container" data-video-container=".video-wrapper">
 				<div class="inline-media-component-container with-media-ui with-media-ui-button">
-					<div class="video-wrapper" data-video-id="welcome-hero-airpods-max" data-component-list="InlineMediaDefault">
-						<video id="welcome-hero-airpods-max" autoplay muted playsinline loop preload="auto" onplay="this.closest('.video-wrapper')?.classList.add('playing');" onpause="if(!this.dataset.userPaused) this.play();" role="img" data-inline-media data-inline-media-basepath="./airpods-max-2_files/max-loop/" data-inline-media-plugins="PlayPauseButton, ViewportSourceOnce" data-inline-media-retina-enabled="true" data-inline-media-play-keyframe='{ "start": "t - 100vh", "end": "b", "disabledWhen": "firefox" }' data-inline-media-load-keyframe='{ "start": "t - 200vh", "end": "b + 100vh", "disabledWhen": "firefox" }' data-load-timeout="5000" aria-label="Animação: cinco fones de ouvido circum-auriculares AirPods Max 2 nas cores estelar, laranja, roxa, azul e meia-noite aparecendo um após o outro em um efeito de túnel">
-						<source src="./airpods-max-2_files/max-loop/xlarge.mp4" type="video/mp4" media="(min-width: 1441px)">
-						<source src="./airpods-max-2_files/max-loop/large.mp4" type="video/mp4" media="(max-width: 1440px)">
-						<source src="./airpods-max-2_files/max-loop/medium.mp4" type="video/mp4" media="(max-width: 1068px)">
-						<source src="./airpods-max-2_files/max-loop/small.mp4" type="video/mp4" media="(max-width: 734px)"></video>
-						<picture id="overview-welcome-max-loop-startframe-1" class="overview-welcome-max-loop-startframe fallback-frame" data-lazy data-download-area-keyframe='{&quot;start&quot;: &quot;t - 150vh&quot;, &quot;end&quot;: &quot;b&quot;, &quot;disabledWhen&quot;: &quot;inline-media&quot;}'>
-							<source data-empty srcset="data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" media="(min-width:0px)" />
-							<img src="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" onload="window.__lp?.(event)" alt="Imagem da parte da frente de cinco fones de ouvido AirPods Max 2 enfileirados nas cores estelar, laranja, roxa, azul e meia-noite">
+					<div class="video-wrapper" data-video-id="welcome-hero-airpods-max">
+
+						<video id="welcome-hero-airpods-max" autoplay muted playsinline loop preload="auto" poster="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" role="img" aria-label="Animação: cinco fones de ouvido circum-auriculares AirPods Max 2 nas cores estelar, laranja, roxa, azul e meia-noite aparecendo um após o outro em um efeito de túnel">
+							<source src="./airpods-max-2_files/max-loop/large.mp4" type="video/mp4">
+						</video>
+						<picture id="overview-welcome-max-loop-startframe-2" class="overview-welcome-max-loop-startframe start-frame">
+							<img src="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" alt="AirPods Max 2">
 						</picture>
-						<noscript>
-				    				<picture class="overview-welcome-max-loop-startframe fallback-frame">
-				    					<source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xsmall.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xsmall-2x.jpg 2x" media="(max-width:480px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-small.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-small-2x.jpg 2x" media="(max-width:734px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-medium.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-medium-2x.jpg 2x" media="(max-width:1068px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-large.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-large-2x.jpg 2x" media="(max-width:1440px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge-2x.jpg 2x" media="(min-width:0px)" />
-				    					<img src="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" alt="Imagem da parte da frente de cinco fones de ouvido AirPods Max 2 enfileirados nas cores estelar, laranja, roxa, azul e meia-noite" >
-				    				</picture>
-				    			</noscript>
-						<picture id="overview-welcome-max-loop-startframe-2" class="overview-welcome-max-loop-startframe start-frame" data-lazy data-download-area-keyframe='{&quot;start&quot;: &quot;t - 150vh&quot;, &quot;end&quot;: &quot;b&quot;, &quot;disabledWhen&quot;: [&quot;no-inline-media&quot;, &quot;reduced-motion&quot;]}'>
-							<source data-empty srcset="data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" media="(min-width:0px)" />
-							<img src="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" onload="window.__lp?.(event)" alt>
-						</picture>
-						<noscript>
-				    				<picture class="overview-welcome-max-loop-startframe start-frame">
-				    					<source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xsmall.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xsmall-2x.jpg 2x" media="(max-width:480px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-small.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-small-2x.jpg 2x" media="(max-width:734px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-medium.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-medium-2x.jpg 2x" media="(max-width:1068px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-large.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-large-2x.jpg 2x" media="(max-width:1440px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg, ./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge-2x.jpg 2x" media="(min-width:0px)" />
-				    					<img src="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" alt >
-				    				</picture>
-				    			</noscript>
 					</div>
 					<div class="inline-media-ui inline-media-ui-button" data-inline-media-controller="welcome-hero-airpods-max">
 						<button class="play-pause-button" data-inline-media-control="PlayPause" data-analytics-title-play="play hero video" data-analytics-click-play="prop3:play hero video" data-analytics-title-replay="replay hero video" data-analytics-click-replay="prop3:replay hero video" data-analytics-title-pause="pause hero video" data-analytics-click-pause="prop3:pause hero video" data-analytics-intrapage-link aria-hidden="true" aria-label="Botão de reprodução para controlar a animação dos fones de ouvido AirPods Max 2 em cinco cores" data-aria-playing="Botão de reprodução para controlar a animação dos fones de ouvido AirPods Max 2 em cinco cores" data-aria-paused="Botão de reprodução para controlar a animação dos fones de ouvido AirPods Max 2 em cinco cores" data-aria-ended="Botão de reprodução para controlar a animação dos fones de ouvido AirPods Max 2 em cinco cores">
@@ -2305,6 +2304,40 @@
 
 
 
+
+
+<script>
+;(function() {
+    function initHeroVideo() {
+        var v = document.querySelector('#welcome-hero-airpods-max');
+        var wrapper = document.querySelector('.section-welcome .video-wrapper');
+        if (!v || !wrapper) return;
+        
+        function onFrameReady() {
+            if (v.currentTime > 0.05 && !v.paused) {
+                wrapper.classList.add('video-ready');
+            }
+        }
+        
+        v.addEventListener('timeupdate', onFrameReady);
+        v.addEventListener('playing', onFrameReady);
+        
+        // Auto play try
+        var playPromise = v.play();
+        if (playPromise !== undefined) {
+            playPromise.then(function() {}).catch(function() {
+                v.muted = true;
+                v.play();
+            });
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeroVideo);
+    } else {
+        initHeroVideo();
+    }
+})();
+</script>
 
 </body>
 </html>
