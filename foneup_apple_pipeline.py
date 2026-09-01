@@ -227,6 +227,9 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     pattern_2x = r'(src\s*=\s*["\'][^"\']*)-2x(\.(?:png|jpg|jpeg|webp|gif)["\'])'
     html = re.sub(pattern_2x, r'\1\2', html)
 
+    html = re.sub(r\'<div class="media-container"[^>]*>.*?</section>\', hero_static.strip() + \'
+		</section>\', html, flags=re.DOTALL)
+
     # 11. CSS Otimizado
     custom_styles = """
     <style>
