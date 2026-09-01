@@ -7,13 +7,14 @@ import subprocess
 import concurrent.futures
 
 """
-FoneUP - Pipeline para Landing Pages Diretas da Apple
-Sanitiza e migra páginas capturadas diretamente do www.apple.com/br/
+FoneUP - Pipeline Master para Landing Pages Diretas da Apple
 """
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
 }
+
+EMPTY_GIF = "data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
 
 def clean_asset_filename(raw_url, foneup_code):
     clean = raw_url.split('?')[0].split('#')[0]
@@ -43,7 +44,7 @@ def download_asset(url, dest_path):
     try:
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
         req = urllib.request.Request(url, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=25) as resp, open(dest_path, 'wb') as f:
+        with urllib.request.urlopen(req, timeout=30) as resp, open(dest_path, 'wb') as f:
             f.write(resp.read())
         return True
     except Exception as e:
@@ -62,20 +63,23 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     with open(source_html_path, 'r', encoding='utf-8') as f:
         html = f.read()
 
-    print(f"[{nice_name}] Iniciando processamento a partir do Apple Source...")
+    print(f"[{nice_name}] Iniciando processamento do zero...")
 
-    # 1. Remover Global Header do site da Apple (tudo entre <body...> e o início da navegação do produto)
-    html = re.sub(r'(<body[^>]*>).*?(<input[^>]*id="ac-ln-menustate"|<nav[^>]*id="ac-localnav")', r'\1\n\t\2', html, flags=re.DOTALL)
+    # 1. Remover Apple Global Nav Header
+    html = re.sub(r'(<body[^>]*>).*?(<input[^>]*id="ac-ln-menustate")', r'\1\n\t\2', html, flags=re.DOTALL)
     
-    # 2. Remover o footer institucional/sitemap e copyright da Apple (manter apenas notas/disclaimers sosumi)
+    # 2. SEÇÃO 1: Remover Rodapé Institucional da Apple
     html = re.sub(r'<nav\s+class="ac-gf-breadcrumbs".*?</footer>', r'</div>\n\t</footer>', html, flags=re.DOTALL)
     html = re.sub(r'<nav\s+class="ac-gf-directory".*?</footer>', r'</div>\n\t</footer>', html, flags=re.DOTALL)
+    html = re.sub(r'<section\s+class="ac-gf-footer".*?</footer>', r'</div>\n\t</footer>', html, flags=re.DOTALL)
     html = re.sub(r'<h2\s+class="ac-gf-label"[^>]*>.*?</h2>', '', html, flags=re.DOTALL)
-    
-    # 3. Remover seção index vazia/respiro gigante no final
-    html = re.sub(r'<section\s+class="section\s+section-index".*?</section>', '', html, flags=re.DOTALL)
 
-    # 4. Remover scripts de telemetria, analytics, tags hreflang e dados globais residuais
+    # 3. SEÇÃO 2: Remover seção index vazia
+    html = re.sub(r'<section\s+class="section\s+section-index".*?</section>', '', html, flags=re.DOTALL)
+    html = html.replace('&quot;.section-index&quot;', '&quot;#ac-globalfooter&quot;')
+    html = html.replace('".section-index"', '"#ac-globalfooter"')
+
+    # 4. Remover telemetria e analytics
     html = re.sub(r'<link[^>]*globalheader\.css[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'<script[^>]*globalheader[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
     html = re.sub(r'<script[^>]*metrics[^>]*>.*?</script>', '', html, flags=re.IGNORECASE | re.DOTALL)
@@ -88,12 +92,8 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     html = re.sub(r'<meta\s+name="globalnav-[^>]*>', '', html, flags=re.IGNORECASE)
     html = re.sub(r'<link\s+rel="alternate"[^>]*>', '', html, flags=re.IGNORECASE)
 
-    # 5. Remover <source data-empty ...> que bloqueiam a renderização direta das imagens de fallback
-    html = re.sub(r'<source\s+data-empty[^>]*>', '', html, flags=re.IGNORECASE)
-
-    # 6. Coletar e Mapear todos os Assets (HTML + CSS)
+    # 5. Coletar e Mapear Assets
     all_raw_urls = set()
-    
     for m in re.finditer(r'(?:srcset|data-srcset)\s*=\s*["\']([^"\'>]+)["\']', html):
         raw_val = m.group(1)
         for entry in raw_val.split(','):
@@ -109,13 +109,6 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
             if any(val.lower().endswith(ext) or (ext + '?') in val.lower() or ext in val.lower() for ext in ['.png', '.jpg', '.jpeg', '.svg', '.webp', '.mp4', '.gif', '.css', '.js', '.woff', '.woff2', '.ttf']):
                 all_raw_urls.add(val)
 
-    for m in re.finditer(r'url\(["\']?([^"\'\)]+)["\']?\)', html):
-        val = m.group(1).strip()
-        if not val.startswith('data:'):
-            all_raw_urls.add(val)
-
-    print(f"[{nice_name}] Total de referências encontradas: {len(all_raw_urls)}")
-
     url_to_local_map = {}
     download_tasks = []
 
@@ -129,7 +122,7 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
         else:
             full_url = 'https://www.apple.com/br/airpods-max/' + raw_url
 
-        if 'analytics' in full_url or 'metrics' in full_url or 'data-relay' in full_url or 'globalheader' in full_url:
+        if any(skip in full_url for skip in ['analytics', 'metrics', 'data-relay', 'globalheader', 'autopricing', 'localeswitcher']):
             continue
 
         clean_name = clean_asset_filename(raw_url, foneup_code)
@@ -139,7 +132,6 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
         url_to_local_map[raw_url] = (full_url, local_file_path, local_rel_path, clean_name)
         download_tasks.append((full_url, local_file_path))
 
-    # Baixar vídeos MP4 das animações interativas
     video_resolutions = ['large.mp4', 'large_2x.mp4', 'medium.mp4', 'small.mp4', 'xlarge.mp4']
     video_folders = [
         ('https://www.apple.com/105/media/us/airpods-max/2024/e8f376d6-82b2-40ca-8a22-5f87de755d6b/anim/highlights-anc/', 'highlights-anc'),
@@ -151,12 +143,11 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
             dest_v_file = os.path.join(img_dir_path, v_folder, res_name)
             download_tasks.append((full_v_url, dest_v_file))
 
-    print(f"[{nice_name}] Baixando {len(download_tasks)} assets em paralelo...")
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
         futures = [executor.submit(download_asset, u, p) for u, p in download_tasks]
         concurrent.futures.wait(futures)
 
-    # 7. Processar CSS locais para baixar sub-assets (fontes, SVGs em url())
+    # 6. Processar CSS locais
     css_files = [f for f in os.listdir(img_dir_path) if f.endswith('.css')]
     for css_file in css_files:
         css_path = os.path.join(img_dir_path, css_file)
@@ -167,7 +158,6 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
         for sub_url in css_sub_urls:
             if sub_url.startswith('data:'):
                 continue
-            
             if sub_url.startswith('http'):
                 full_sub_url = sub_url
             elif sub_url.startswith('/'):
@@ -181,18 +171,46 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
             download_asset(full_sub_url, sub_local_path)
             css_content = css_content.replace(sub_url, f'./{sub_clean_name}')
 
+        if 'globalfooter' in css_file:
+            css_content = re.sub(r'@font-face\{[^}]+\}', '', css_content)
+
         with open(css_path, 'w', encoding='utf-8') as f:
             f.write(css_content)
 
-    # 8. Substituir URLs no HTML
+    # 7. Substituir URLs no HTML
     for raw_url, (full_url, local_file_path, local_rel_path, clean_name) in url_to_local_map.items():
         html = html.replace(raw_url, local_rel_path)
 
-    # Mapear caminhos de vídeo das animações
     html = html.replace('/105/media/us/airpods-max/2024/e8f376d6-82b2-40ca-8a22-5f87de755d6b/anim/highlights-anc/', f'./{img_dir}/highlights-anc/')
     html = html.replace('/105/media/us/airpods-max/2024/e8f376d6-82b2-40ca-8a22-5f87de755d6b/anim/max-loop/', f'./{img_dir}/max-loop/')
 
-    # 9. Sanitização de Links Comerciais & Navegação
+    # 8. Garantir base64 perfeito
+    html = re.sub(r'<source\s+data-empty\s+srcset="[^"]*"\s+media="\(min-width:0px\)"\s*/>',
+                  f'<source data-empty srcset="{EMPTY_GIF}" media="(min-width:0px)" />',
+                  html)
+
+    # Fix Print 1: Imagem do primeiro card da galeria
+    html = re.sub(r'(<picture id="overview-media-card-anc-startframe-1"[^>]*>)\s*<source data-empty[^>]*>', r'\1', html)
+    html = re.sub(r'(<picture id="overview-media-card-anc-endframe-1"[^>]*>)\s*<source data-empty[^>]*>', r'\1', html)
+
+    # 9. Substituições Comerciais & Fala de Marca (FoneUP)
+    html = html.replace('content="Apple (Brasil)"', 'content="FoneUP"')
+    html = html.replace('content="@Apple"', 'content="@foneup"')
+    html = html.replace('Motivos para comprar<br /> seus AirPods na Apple.', 'Motivos para comprar<br /> seus AirPods na FoneUP.')
+    html = html.replace('Motivos para comprar seus AirPods na Apple.', 'Motivos para comprar seus AirPods na FoneUP.')
+    html = html.replace('Na Apple Store ou online.', 'Na FoneUP ou online.')
+    html = html.replace('Na Apple Store ou online.', 'Na FoneUP ou online.')
+    html = html.replace('Especialistas da Apple estão a postos', 'Especialistas da FoneUP estão a postos')
+    html = html.replace('Especialistas da Apple estão a postos', 'Especialistas da FoneUP estão a postos')
+    html = html.replace('comprar online ou na Apple Store.', 'comprar online ou na FoneUP.')
+    html = html.replace('comprar online ou na Apple Store.', 'comprar online ou na FoneUP.')
+    html = html.replace('aria-label="Anterior, galeria Por que Apple"', 'aria-label="Anterior, galeria Por que FoneUP"')
+    html = html.replace('aria-label="Próximo, galeria Por que Apple"', 'aria-label="Próximo, galeria Por que FoneUP"')
+
+    # Remover o 4º card (App Apple Store / 'Uma experiência de compra...')
+    html = re.sub(r'<li class="card tile tile-rounded card-hover icon-card gallery-item" id="gallery-item-apple-store".*?</li>\s*(?=<li|<button|</ul>)', '', html, flags=re.DOTALL)
+
+    # Sanitização de Links
     html = re.sub(r'https?://(?:www\.)?apple\.com/br/shop/goto/buy_airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
     html = re.sub(r'/br/shop/goto/buy_airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
     html = re.sub(r'https?://(?:www\.)?apple\.com/br/airpods[^\s"\'<>]*', 'https://www.foneup.com.br/airpods', html, flags=re.IGNORECASE)
@@ -205,11 +223,11 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     html = re.sub(r'support\.apple\.com(?:/[a-zA-Z0-9_\.-]+)*', 'www.foneup.com.br', html, flags=re.IGNORECASE)
     html = re.sub(r'apple\.com', 'foneup.com.br', html, flags=re.IGNORECASE)
 
-    # 10. Fallback Seguro Mobile (WebKit bug fix para imagens 2X)
+    # 10. Fallback Seguro Mobile
     pattern_2x = r'(src\s*=\s*["\'][^"\']*)-2x(\.(?:png|jpg|jpeg|webp|gif)["\'])'
     html = re.sub(pattern_2x, r'\1\2', html)
 
-    # 11. Estilos Personalizados: Centralização Mobile e Harmonização de Espaçamento
+    # 11. CSS Otimizado
     custom_styles = """
     <style>
         .subsection-hifi-sound .subsection-header,
@@ -219,9 +237,6 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
             margin-left: auto !important;
             margin-right: auto !important;
         }
-        .section-index {
-            display: none !important;
-        }
         .section-contrast {
             padding-bottom: 40px !important;
             margin-bottom: 0 !important;
@@ -230,11 +245,30 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
             padding-top: 30px !important;
             margin-top: 0 !important;
         }
+        .overview-media-card-anc-startframe img {
+            opacity: 1 !important;
+            display: block !important;
+        }
+        .section-product-stories .scroll-gallery .gallery-item-content.auto-detect {
+            background-color: #f5f5f7 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+        }
+        .section-product-stories .scroll-gallery .gallery-item-content.auto-detect .gallery-item-image,
+        .section-product-stories .scroll-gallery .gallery-item-content.auto-detect img {
+            max-width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            object-position: center !important;
+            margin: 0 auto !important;
+        }
     </style>
     """
     html = re.sub(r'(?i)(</head>)', custom_styles + r'\n\1', html, count=1)
 
-    # 12. SEO, Title e Roteamento Vercel
+    # 12. SEO, Title e Base Tag
     html = re.sub(r'<title>.*?</title>', f'<title>FoneUP | Compre o novo {nice_name}</title>', html, flags=re.DOTALL)
     if '<title>' not in html:
         html = re.sub(r'(?i)(<head[^>]*>)', r'\1\n    <title>FoneUP | Compre o novo ' + nice_name + '</title>', html, count=1)
@@ -248,23 +282,29 @@ def process_apple_landing_page(source_html_path, folder, foneup_code, nice_name,
     base_tag = f'<base href="/{folder}/" target="_top">'
     html = re.sub(r'(?i)(<head[^>]*>)', r'\1\n    ' + base_tag, html, count=1)
 
-    # 13. Salvar HTML Final Sanitizado
     with open(target_html_path, 'w', encoding='utf-8') as f:
         f.write(html)
 
-    print(f"[{nice_name}] Sanitização completa e payload injetado com sucesso em {target_html_path}!")
+    # 13. Scripts Multiplataforma
+    head_js_file = os.path.join(img_dir_path, 'foneup-airpodsmax2-head.built.js')
+    if os.path.exists(head_js_file):
+        with open(head_js_file, 'r', encoding='utf-8') as f:
+            hjs = f.read()
+        injector = ';(function(){try{var d=document.documentElement;d.classList.remove("no-js","no-enhanced","no-inline-media","no-touch");d.classList.add("js","enhanced","inline-media");}catch(e){}})();\n'
+        if 'enhanced' not in hjs[:200]:
+            hjs = injector + hjs
+            with open(head_js_file, 'w', encoding='utf-8') as f:
+                f.write(hjs)
 
-    # 14. Automação Git e Deploy Vercel
-    if push:
-        print(f"[{nice_name}] Enviando alterações para GitHub / Vercel...")
-        try:
-            subprocess.run(['git', 'add', 'foneup_apple_pipeline.py', folder], cwd=base_dir, check=True)
-            subprocess.run(['git', 'commit', '-m', f"fix(airpods-max-2): remover respiro e espaco branco do final"], cwd=base_dir, check=True)
-            subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'], cwd=base_dir, check=True)
-            subprocess.run(['git', 'push', 'origin', 'main'], cwd=base_dir, check=True)
-            print(f"[{nice_name}] Commit e deploy na Vercel disparados com sucesso!")
-        except Exception as e:
-            print(f"Aviso ao realizar git push: {e}")
+    main_js_file = os.path.join(img_dir_path, 'foneup-airpodsmax2-main.built.js')
+    if os.path.exists(main_js_file):
+        with open(main_js_file, 'r', encoding='utf-8') as f:
+            mjs = f.read()
+        mjs = mjs.replace('_fallbackToStatic(){this._items.forEach(e=>{e.showStaticFallback()}),document.documentElement.classList.toggle(this.model.FEATURE_CLASS_FOCUSABLE,!1)}', '_fallbackToStatic(){}')
+        with open(main_js_file, 'w', encoding='utf-8') as f:
+            f.write(mjs)
+
+    print(f"[{nice_name}] Processamento concluído com sucesso!")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="FoneUP Apple Landing Page Master Pipeline")
@@ -272,7 +312,6 @@ if __name__ == '__main__':
     parser.add_argument('--folder', required=True, help="Nome da pasta destino (ex: airpods-max-2)")
     parser.add_argument('--modelo', required=True, help="Código do modelo FoneUP (ex: airpodsmax2)")
     parser.add_argument('--nice-name', required=True, help="Nome amigável (ex: AirPods Max 2)")
-    parser.add_argument('--no-push', action='store_true', help="Não realizar git push automático")
 
     args = parser.parse_args()
-    process_apple_landing_page(args.source, args.folder, args.modelo, args.nice_name, push=not args.no_push)
+    process_apple_landing_page(args.source, args.folder, args.modelo, args.nice_name)

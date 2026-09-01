@@ -189,9 +189,9 @@
 	<meta property="og:description" content="Conheça os AirPods Max 2. Experiência avançada em fones de ouvido circum-auriculares. 5 cores. Agora com Cancelamento Ativo de Ruído até 1,5x melhor."  />
 	<meta property="og:url" content="https://www.foneup.com.br/airpods" />
 	<meta property="og:locale" content="pt_BR" />
-	<meta property="og:site_name" content="Apple (Brasil)" />
+	<meta property="og:site_name" content="FoneUP" />
 	<meta property="og:type" content="website" />
-	<meta name="twitter:site" content="@Apple" />
+	<meta name="twitter:site" content="@foneup" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta property="analytics-track" content="airpods max - overview" />
 	<meta property="analytics-s-channel" content="airpodsmax" />
@@ -312,6 +312,7 @@
 	<link rel="stylesheet" href="./airpods-max-2_files/foneup-airpodsmax2-overview-locale.built.css" type="text/css" />
 	<script src="./airpods-max-2_files/foneup-airpodsmax2-head.built.js" type="text/javascript" charset="utf-8"></script>
 
+    
     <style>
         .subsection-hifi-sound .subsection-header,
         .subsection-hifi-sound .subsection-headline,
@@ -328,7 +329,29 @@
             padding-top: 30px !important;
             margin-top: 0 !important;
         }
+        /* Fix Print 1: Startframe sempre visivel */
+        .overview-media-card-anc-startframe img {
+            opacity: 1 !important;
+            display: block !important;
+        }
+        /* Fix Print 2: Card de Pareamento Dinâmico perfeitamente ajustado e centralizado */
+        .section-product-stories .scroll-gallery .gallery-item-content.auto-detect {
+            background-color: #f5f5f7 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            overflow: hidden !important;
+        }
+        .section-product-stories .scroll-gallery .gallery-item-content.auto-detect .gallery-item-image,
+        .section-product-stories .scroll-gallery .gallery-item-content.auto-detect img {
+            max-width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            object-position: center !important;
+            margin: 0 auto !important;
+        }
     </style>
+
     
 </head>
 <body class="page-overview " data-component-list="AllAccessPassL1 FocusManager">
@@ -548,7 +571,6 @@
 								<figure class="media-container pin-left" role="group">
 									<video class="positioned-media-element pin-offset media" id="media-card-gallery-video-1" preload="none" src="" playsinline muted data-inline-media role="img" aria-label="Animação de uma imagem aproximada da lateral dos AirPods Max 2"></video>
 									<picture id="overview-media-card-anc-endframe-1" class="overview-media-card-anc-endframe positioned-media-element pin-offset static hide" data-lazy data-download-area-keyframe='{&quot;anchors&quot;:[&quot;[data-media-card-gallery]&quot;], &quot;start&quot;: &quot;a0t - 120vh&quot;, &quot;end&quot;: &quot;a0b&quot;,&quot;disabledWhen&quot;: &quot;enhanced&quot;}'>
-										<source data-empty srcset="data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" media="(min-width:0px)" />
 										<img src="./airpods-max-2_files/foneup-airpodsmax2-anc-endframe-xlarge.jpg" onload="window.__lp?.(event)" alt="Imagem lateral dos fones de ouvido dos AirPods Max 2 mostrando detalhes da haste ajustável, almofada e botão de controle de ruído">
 									</picture>
 									<noscript>
@@ -568,7 +590,6 @@
 				                                	</picture>
 				                                </noscript>
 									<picture id="overview-media-card-anc-startframe-1" class="overview-media-card-anc-startframe positioned-media-element pin-offset startframe show" data-lazy aria-hidden="true" data-download-area-keyframe='{&quot;anchors&quot;:[&quot;[data-media-card-gallery]&quot;], &quot;start&quot;: &quot;a0t - 120vh&quot;, &quot;end&quot;: &quot;a0b&quot;,&quot;disabledWhen&quot;: &quot;no-enhanced&quot;}'>
-										<source data-empty srcset="data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" media="(min-width:0px)" />
 										<img src="./airpods-max-2_files/foneup-airpodsmax2-anc-startframe-xlarge.jpg" onload="window.__lp?.(event)" alt>
 									</picture>
 									<noscript>
@@ -1497,7 +1518,7 @@
 		<section class="section section-icon-card background-alt no-pad-bottom" data-anim-scroll-group="Icon Card" data-aap-hide-kf='{"start": "a0t - 50vh", "end": "a0b - 75vh", "anchors": [".section-icon-card"]}' data-analytics-section-engagement="name:why apple gallery" data-component-list="StaggeredFadeIn">
 			<div class="viewport-content">
 				<header class="section-header row">
-					<h2 class="section-header-headline typography-section-header-headline" data-staggered-item id="icon-card-gallery-headline">Motivos para comprar<br /> seus AirPods na Apple.</h2>
+					<h2 class="section-header-headline typography-section-header-headline" data-staggered-item id="icon-card-gallery-headline">Motivos para comprar<br /> seus AirPods na FoneUP.</h2>
 					<div class="section-header-cta-list-wrapper">
 						<ul class="section-header-cta-list typography-section-header-link column">
 							<li class="section-header-cta-item section-header-cta-item-link1" data-staggered-item>
@@ -1655,7 +1676,7 @@
 										</div>
 										<div class="icon-card-copy-wrapper">
 											<h3 class="icon-card-headline typography-icon-card-headline">Compre com quem entende de AirPods.</h3>
-											<p class="icon-card-body-copy typography-icon-card-body-copy">Fale com especialistas para fazer a melhor escolha. Na Apple Store ou online.</p>
+											<p class="icon-card-body-copy typography-icon-card-body-copy">Fale com especialistas para fazer a melhor escolha. Na FoneUP ou online.</p>
 										</div>
 									</div>
 								</div>
@@ -1667,7 +1688,7 @@
 													<div class="icon-card-modal-content-terms">
 														<h2 class="typography-modal-header-topic-label modal-topic-label">Recomendação especializada</h2>
 														<h3 class="typography-modal-header-headline modal-headline">Receba ajuda para encontrar o produto ideal.</h3>
-														<p class="typography-icon-card-modal-content-inline-headline icon-card-modal-inline-headline">Especialistas da Apple estão a postos para tirar suas dúvidas. Conte com a nossa assessoria na hora de comprar online ou na Apple Store.</p>
+														<p class="typography-icon-card-modal-content-inline-headline icon-card-modal-inline-headline">Especialistas da FoneUP estão a postos para tirar suas dúvidas. Conte com a nossa assessoria na hora de comprar online ou na FoneUP.</p>
 														<p class="modal-link"><a href="https://www.foneup.com.br" data-analytics-title="shop together with a specialist" data-analytics-exit-link class="icon-wrapper"><span class="icon-copy">Comprar online com nossa equipe</span><span class="icon icon-after more"></span></a></p>
 													</div>
 												</div>
@@ -1702,98 +1723,19 @@
 				    			                        </div>
 				    			                    </button>
 							</li>
-							<li class="card tile tile-rounded card-hover icon-card gallery-item" id="gallery-item-apple-store" data-ac-gallery-item role="listitem" data-analytics-gallery-item-id="apple store app" data-component-list="Card WillChange" data-staggered-item>
-								<div class="tile-content">
-									<div class="icon-card-content">
-										<div class="icon-card-icon-wrapper">
-											<picture id="overview-icon-card-icon-app-applestore-1" class="overview-icon-card-icon-app-applestore icon-card-icon" data-lazy>
-												<source data-empty srcset="data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" media="(min-width:0px)" />
-												<img src="./airpods-max-2_files/foneup-airpodsmax2-icon-app-foneupstore-large.png" onload="window.__lp?.(event)" alt>
-											</picture>
-											<noscript>
-				    			                    	<picture class="overview-icon-card-icon-app-applestore icon-card-icon">
-				    			                    		<source srcset="./airpods-max-2_files/foneup-airpodsmax2-icon-app-foneupstore-large.png, ./airpods-max-2_files/foneup-airpodsmax2-icon-app-foneupstore-large-2x.png 2x" media="(min-width:0px)" />
-				    			                    		<img src="./airpods-max-2_files/foneup-airpodsmax2-icon-app-foneupstore-large.png" alt >
-				    			                    	</picture>
-				    			                    </noscript>
-										</div>
-										<div class="icon-card-copy-wrapper">
-											<h3 class="icon-card-headline typography-icon-card-headline">Uma experiência de compra inspirada em você.</h3>
-											<p class="icon-card-body-copy typography-icon-card-body-copy">App&nbsp;Apple&nbsp;Store. Um jeito mais pessoal de comprar.</p>
-										</div>
-									</div>
-								</div>
-								<div data-component-list="Modal" aria-modal="true" role="dialog" tabindex="-1" class="ric-modal ric-modal-scrim ric-modal-scrim-blur  ric-modal-page-overlay icon-card-modal" aria-hidden="true" data-modal-container data-modal-close id="icon-card-shopping-experience">
-									<div class="ric-modal-overlay-container" data-modal-overlay-container data-modal-close>
-										<div class="ric-modal-overlay" data-modal-overlay>
-											<div class="ric-modal-content-wrapper" data-modal-content-wrapper data-analytics-activitymap-region-id="apple store app modal">
-												<div class="icon-card-modal-content">
-													<div class="icon-card-modal-content-image">
-														<h2 class="typography-modal-header-topic-label modal-topic-label">App Apple&nbsp;Store</h2>
-														<h3 class="typography-modal-header-headline modal-headline">Compre no app Apple&nbsp;Store. Feito sob medida para você.</h3>
-														<p class="typography-icon-card-modal-content-inline-headline icon-card-modal-inline-headline">
-															<p>Receba recomendações personalizadas de produtos, compare modelos, acesse os itens salvos e acompanhe seus pedidos. Inscreva‑se para receber informações sobre novos produtos, promoções, opções flexíveis de pagamento e eventos da loja.</p>
-															<p>Escaneie o código QR para começar.</p>
-														</p>
-														<p class="modal-link"><a href="https://www.foneup.com.br" data-analytics-title="download the apple store app" data-analytics-exit-link class="icon-wrapper"><span class="icon-copy">Download the Apple Store app</span><span class="icon icon-after more"></span></a></p>
-														<div class="image-container">
-															<picture id="overview-icon-card-boc-qr-code-1" class="overview-icon-card-boc-qr-code" data-lazy data-download-area-keyframe='{"start": "t - 190vh", "end": "b"}' data-focus-expression='{"expression": "t - 50vh + 50h", "focus-target-child": "img"}'>
-																<source data-empty srcset="data:image/gif;base64,R0lGODlhAQABAHAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" media="(min-width:0px)" />
-																<img src="./airpods-max-2_files/foneup-airpodsmax2-boc-qr-code-large.jpg" onload="window.__lp?.(event)" alt="Escaneie o código QR para comprar no app Apple Store.">
-															</picture>
-															<noscript>
-				    			                                            	<picture class="overview-icon-card-boc-qr-code">
-				    			                                            		<source srcset="./airpods-max-2_files/foneup-airpodsmax2-boc-qr-code-medium.jpg, ./airpods-max-2_files/foneup-airpodsmax2-boc-qr-code-medium-2x.jpg 2x" media="(max-width:1068px)" /><source srcset="./airpods-max-2_files/foneup-airpodsmax2-boc-qr-code-large.jpg, ./airpods-max-2_files/foneup-airpodsmax2-boc-qr-code-large-2x.jpg 2x" media="(min-width:0px)" />
-				    			                                            		<img src="./airpods-max-2_files/foneup-airpodsmax2-boc-qr-code-large.jpg" alt="Escaneie o código QR para comprar no app Apple Store." >
-				    			                                            	</picture>
-				    			                                            </noscript>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="ric-modal-close-button-wrapper" data-modal-close-button-wrapper>
-												<button aria-label="Fechar este modal" class="ric-modal-close-button" data-modal-close-button data-modal-close>
-				    			                                  <span
-				    			                                    class="ric-modal-close-icon"
-				    			                                    data-modal-close-icon
-				    			                                  >
-				    			                                      <svg 
-				    			                                          class="icon-control icon-control-close"
-				    			                                          xmlns="http://www.w3.org/2000/svg" 
-				    			                                          viewBox="0 0 36 36">
-				    			                                          <path d="m20.1211 18 3.4395-3.4395c.5859-.5854.5859-1.5356 0-2.1211-.5859-.5859-1.5352-.5859-2.1211 0l-3.4395 3.4395-3.4395-3.4395c-.5859-.5859-1.5352-.5859-2.1211 0-.5859.5854-.5859 1.5356 0 2.1211l3.4395 3.4395-3.4395 3.4395c-.5859.5854-.5859 1.5356 0 2.1211.293.293.6768.4395 1.0605.4395s.7676-.1465 1.0605-.4395l3.4395-3.4395 3.4395 3.4395c.293.293.6768.4395 1.0605.4395s.7676-.1465 1.0605-.4395c.5859-.5854.5859-1.5356 0-2.1211l-3.4395-3.4395z"></path>
-				    			                                      </svg>    </span>
-				    			                                </button>
-											</div>
-										</div>
-									</div>
-								</div>
-								<button data-modal-open="icon-card-shopping-experience" data-analytics-intrapage-link tabindex="0" class="card-control" data-analytics-title="open modal - apple store app" data-analytics-click="prop3:open modal - apple store app" aria-label="Saiba mais sobre comprar no app Apple Store">
-				    			                        <div class="tile-button-wrapper">
-				    			                          <span
-				    			                            class="tile-button tile-button-high-contrast">
-				    			                                <svg 
-				    			                                    class="icon-control icon-control-plus tile-icon"
-				    			                                    xmlns="http://www.w3.org/2000/svg" 
-				    			                                    viewBox="0 0 36 36">
-				    			                                    <path d="m24 16.5h-4.5v-4.5c0-.8286-.6719-1.5-1.5-1.5s-1.5.6714-1.5 1.5v4.5h-4.5c-.8281 0-1.5.6714-1.5 1.5s.6719 1.5 1.5 1.5h4.5v4.5c0 .8286.6719 1.5 1.5 1.5s1.5-.6714 1.5-1.5v-4.5h4.5c.8281 0 1.5-.6714 1.5-1.5s-.6719-1.5-1.5-1.5z"></path>
-				    			                                </svg>        </span>
-				    			                        </div>
-				    			                    </button>
-							</li>
-						</ul>
+							</ul>
 					</div>
 				</div>
 				<div class="scroll-gallery-paddlenav paddlenav paddlenav-alpha hide" data-analytics-gallery-interaction-type="paddlenav" data-gallery-paddlenav data-staggered-item data-focus-expression="{&quot;expression&quot;: &quot;t - 100vh + 290h&quot;, &quot;focus-delay&quot;: &quot;true&quot;, &quot;tabindex&quot;: &quot;-1&quot;}">
 					<ul>
-						<li class="left-item"><button aria-label="Anterior, galeria Por que Apple" class="paddlenav-arrow paddlenav-arrow-previous">
+						<li class="left-item"><button aria-label="Anterior, galeria Por que FoneUP" class="paddlenav-arrow paddlenav-arrow-previous">
 				    					  <svg 
 				    					      class="icon-control icon-control-chevronleft"
 				    					      xmlns="http://www.w3.org/2000/svg" 
 				    					      viewBox="0 0 36 36">
 				    					      <path d="m20 25c-.3838 0-.7676-.1465-1.0605-.4395l-5.5-5.5c-.5859-.5854-.5859-1.5356 0-2.1211l5.5-5.5c.5859-.5859 1.5352-.5859 2.1211 0 .5859.5854.5859 1.5356 0 2.1211l-4.4395 4.4395 4.4395 4.4395c.5859.5854.5859 1.5356 0 2.1211-.293.293-.6768.4395-1.0605.4395z"></path>
 				    					  </svg>		</button></li>
-						<li class="right-item"><button aria-label="Próximo, galeria Por que Apple" class="paddlenav-arrow paddlenav-arrow-next">
+						<li class="right-item"><button aria-label="Próximo, galeria Por que FoneUP" class="paddlenav-arrow paddlenav-arrow-next">
 				    					  <svg 
 				    					      class="icon-control icon-control-chevronright"
 				    					      xmlns="http://www.w3.org/2000/svg" 
