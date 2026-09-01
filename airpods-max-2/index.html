@@ -336,7 +336,7 @@
             padding-top: 30px !important;
             margin-top: 0 !important;
         }
-        /* Hero Video: Sem Fade Out Branco, Loop Infinito Indestrutível */
+        
         .section-welcome .video-wrapper video {
             position: absolute !important;
             top: 0 !important;
@@ -366,6 +366,46 @@
         .section-welcome .video-wrapper.video-ready .start-frame {
             opacity: 0 !important;
         }
+        
+        /* Hero Video Mobile & Desktop: Looping Video Support Everywhere */
+        html.no-inline-media .section-welcome .video-wrapper video,
+        .section-welcome .video-wrapper video,
+        .section-welcome .video-wrapper.ended video,
+        .section-welcome .video-wrapper.paused video,
+        .section-welcome .video-wrapper.playing video {
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            z-index: 2 !important;
+        }
+        html.no-inline-media .section-welcome .video-wrapper .fallback-frame {
+            display: none !important;
+        }
+        .section-welcome .video-wrapper .start-frame {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 3 !important;
+            transition: opacity 0.5s ease !important;
+            pointer-events: none !important;
+        }
+        .section-welcome .video-wrapper .start-frame img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+        .section-welcome .video-wrapper.video-ready .start-frame {
+            opacity: 0 !important;
+        }
+
         /* Highlights ANC startframe */
         .overview-media-card-anc-startframe img {
             opacity: 1 !important;
@@ -514,7 +554,7 @@
 				<div class="inline-media-component-container with-media-ui with-media-ui-button">
 					<div class="video-wrapper" data-video-id="welcome-hero-airpods-max">
 
-						<video id="welcome-hero-airpods-max" autoplay muted playsinline loop preload="auto" poster="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" role="img" aria-label="Animação: cinco fones de ouvido circum-auriculares AirPods Max 2 nas cores estelar, laranja, roxa, azul e meia-noite aparecendo um após o outro em um efeito de túnel">
+						<video id="welcome-hero-airpods-max" autoplay muted playsinline webkit-playsinline loop preload="auto" poster="./airpods-max-2_files/foneup-airpodsmax2-max-loop-startframe-xlarge.jpg" role="img" aria-label="Animação: cinco fones de ouvido circum-auriculares AirPods Max 2 nas cores estelar, laranja, roxa, azul e meia-noite aparecendo um após o outro em um efeito de túnel">
 							<source src="./airpods-max-2_files/max-loop/large.mp4" type="video/mp4">
 						</video>
 						<picture id="overview-welcome-max-loop-startframe-2" class="overview-welcome-max-loop-startframe start-frame">
